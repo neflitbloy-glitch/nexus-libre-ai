@@ -1,10 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY is not defined. Please add it to your secrets.");
-}
+// Vercel uses import.meta.env for client side variables in Vite.
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || "AIzaSyDPRfgaxYsqX_7Fsn0O9cSjiPQAEgp6OwA"; 
 
 export const ai = new GoogleGenAI({ apiKey });
 
