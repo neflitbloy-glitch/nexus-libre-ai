@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    @apply bg-[#050505] text-[#e5e5e5] overflow-hidden;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+@theme {
+  --font-serif: "Georgia", serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
