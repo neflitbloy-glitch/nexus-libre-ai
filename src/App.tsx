@@ -6,7 +6,7 @@
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { Send, Bot, User, Trash2, Shield, Zap, Info, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ai, SYSTEM_PROMPT, SAFETY_SETTINGS } from './lib/gemini';
+import { SYSTEM_PROMPT } from './lib/gemini';
 import { Message } from './types';
 
 export default function App() {
@@ -40,29 +40,45 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      // Prepare history for relevant context if needed, but for simplicity let's do a direct call
-      // or map history to contents format
-      const contents = messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
-      }));
-      contents.push({ role: 'user', parts: [{ text: userMessage.content }] });
+      const openRouterMessages = [
+        { role: "system", content: SYSTEM_PROMPT },
+         ...messages.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        })),
+        { role: "user", content: userMessage.content }
+      ];
 
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-          safetySettings: SAFETY_SETTINGS,
-          temperature: 0.9,
-          topP: 0.95,
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY || "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"}`,
+          "HTTP-Referer": "https://nexus-libre-ai.vercel.app",
+          "X-Title": "Nexus Libre",
+          "Content-Type": "application/json"
         },
+        body: JSON.stringify({
+          // Utilizando modelo Hermes (sem censura) gratuito na OpenRouter
+          model: "nousresearch/hermes-3-llama-3.1-405b:free", 
+          messages: openRouterMessages,
+          temperature: 0.9,
+        })
       });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`OpenRouter Error: ${err}`);
+      }
+
+      const data = await res.json();
+      const responseText = data.choices && data.choices[0] && data.choices[0].message.content 
+        ? data.choices[0].message.content 
+        : "Erro ao processar resposta.";
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        content: response.text || "Erro ao processar resposta.",
+        content: responseText,
         timestamp: Date.now(),
       };
 
