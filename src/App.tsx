@@ -6,7 +6,7 @@
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { Send, Bot, User, Trash2, Shield, Zap, Info, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ai, SYSTEM_PROMPT } from './lib/gemini';
+import { ai, SYSTEM_PROMPT, SAFETY_SETTINGS } from './lib/gemini';
 import { Message } from './types';
 
 export default function App() {
@@ -53,6 +53,7 @@ export default function App() {
         contents,
         config: {
           systemInstruction: SYSTEM_PROMPT,
+          safetySettings: SAFETY_SETTINGS,
           temperature: 0.9,
           topP: 0.95,
         },
