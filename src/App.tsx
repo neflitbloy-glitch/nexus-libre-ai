@@ -49,7 +49,7 @@ export default function App() {
       contents.push({ role: 'user', parts: [{ text: userMessage.content }] });
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
+        model: "gemini-1.5-flash",
         contents,
         config: {
           systemInstruction: SYSTEM_PROMPT,
